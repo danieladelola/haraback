@@ -1,11 +1,11 @@
-# Use PHP 8.3 instead of 8.2
-FROM richarvey/nginx-php-fpm:php83-latest
+# Fixed the image tag here
+FROM richarvey/nginx-php-fpm:php83
 
 # Copy your code
 COPY . /var/www/html
 
 # Install the bcmath extension and other dependencies
-# We use --ignore-platform-reqs to bypass the 'hirak/prestissimo' error in your logs
+# Added --ignore-platform-reqs to bypass version check errors
 RUN apk add --no-cache php83-bcmath && \
     composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
