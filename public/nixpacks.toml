@@ -1,0 +1,13 @@
+[variables]
+    IS_LARAVEL = "yes"
+    NIXPACKS_PHP_ROOT_DIR = "/app/public"
+
+[phases.build]
+    dependsOn = ["install"]
+    cmds = [
+        "composer install --no-dev --optimize-autoloader",
+        "php artisan config:cache",
+        "php artisan route:cache"
+    ]
+# Note: We REMOVED the [phases.start] and [phases.setup] 
+# so Nixpacks can use its default (working) Nginx/PHP startup logic.
