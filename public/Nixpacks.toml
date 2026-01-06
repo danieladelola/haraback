@@ -1,0 +1,12 @@
+[phases.setup]
+packages = ["php", "composer", "nginx"]
+
+[phases.build]
+commands = [
+  "composer install --no-dev --optimize-autoloader",
+  "php artisan key:generate || true",
+  "php artisan config:cache"
+]
+
+[phases.start]
+command = "php-fpm"
