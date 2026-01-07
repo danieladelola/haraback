@@ -1054,7 +1054,7 @@
                 </div>
             </div>
             <div class="hero-image animate fadeInRight">
-                <img src="https://dashboard.haratrading.com/trading.jpg" alt="Crypto Staking Dashboard">
+                <img src="/trading.jpg" alt="Crypto Staking Dashboard">
             </div>
         </div>
     </div>
