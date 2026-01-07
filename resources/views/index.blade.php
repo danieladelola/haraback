@@ -1134,71 +1134,9 @@
                         <th>Volume (24h)</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="market-tbody">
                     <tr>
-                        <td>
-                            <div class="coin">
-                                <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="Bitcoin" class="coin-icon">
-                                <span class="coin-name">Bitcoin</span>
-                                <span class="coin-symbol">BTC</span>
-                            </div>
-                        </td>
-                        <td class="market-price market-price-btc">$42,876.12</td>
-                        <td class="price-up market-change-btc">+2.34%</td>
-                        <td>$820.4B</td>
-                        <td>$24.3B</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="coin">
-                                <img src="https://assets.coingecko.com/coins/images/279/large/ethereum.png" alt="Ethereum" class="coin-icon">
-                                <span class="coin-name">Ethereum</span>
-                                <span class="coin-symbol">ETH</span>
-                            </div>
-                        </td>
-                        <td class="market-price market-price-eth">$2,345.67</td>
-                        <td class="price-up market-change-eth">+1.56%</td>
-                        <td>$280.1B</td>
-                        <td>$12.7B</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="coin">
-                                <img src="https://assets.coingecko.com/coins/images/975/large/cardano.png" alt="Cardano" class="coin-icon">
-                                <span class="coin-name">Cardano</span>
-                                <span class="coin-symbol">ADA</span>
-                            </div>
-                        </td>
-                        <td class="market-price market-price-ada">$0.4567</td>
-                        <td class="price-down market-change-ada">-0.78%</td>
-                        <td>$15.9B</td>
-                        <td>$1.2B</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="coin">
-                                <img src="https://assets.coingecko.com/coins/images/4128/large/solana.png" alt="Solana" class="coin-icon">
-                                <span class="coin-name">Solana</span>
-                                <span class="coin-symbol">SOL</span>
-                            </div>
-                        </td>
-                        <td class="market-price market-price-sol">$98.76</td>
-                        <td class="price-up market-change-sol">+5.23%</td>
-                        <td>$41.2B</td>
-                        <td>$3.4B</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="coin">
-                                <img src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png" alt="XRP" class="coin-icon">
-                                <span class="coin-name">XRP</span>
-                                <span class="coin-symbol">XRP</span>
-                            </div>
-                        </td>
-                        <td class="market-price market-price-xrp">$0.5678</td>
-                        <td class="price-down market-change-xrp">-1.12%</td>
-                        <td>$28.7B</td>
-                        <td>$2.1B</td>
+                        <td colspan="5" style="text-align: center; color: rgba(255, 255, 255, 0.7);">Loading market data...</td>
                     </tr>
                 </tbody>
             </table>
@@ -1641,6 +1579,49 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = 'auto';
         }
     });
+});
+
+// Market Data Automation
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.getElementById('market-tbody');
+    
+    async function fetchMarketData() {
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=5&page=1&sparkline=false&price_change_percentage=24h');
+            const data = await response.json();
+            
+            tbody.innerHTML = '';
+            
+            data.forEach(coin => {
+                const priceChangeClass = coin.price_change_percentage_24h >= 0 ? 'price-up' : 'price-down';
+                const priceChangeSign = coin.price_change_percentage_24h >= 0 ? '+' : '';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="coin">
+                            <img src="${coin.image}" alt="${coin.name}" class="coin-icon">
+                            <span class="coin-name">${coin.name}</span>
+                            <span class="coin-symbol">${coin.symbol.toUpperCase()}</span>
+                        </div>
+                    </td>
+                    <td class="market-price">$${coin.current_price.toLocaleString()}</td>
+                    <td class="${priceChangeClass}">${priceChangeSign}${coin.price_change_percentage_24h.toFixed(2)}%</td>
+                    <td>$${(coin.market_cap / 1e9).toFixed(1)}B</td>
+                    <td>$${(coin.total_volume / 1e9).toFixed(1)}B</td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error fetching market data:', error);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: rgba(255, 255, 255, 0.7);">Failed to load market data. Please try again later.</td></tr>';
+        }
+    }
+    
+    fetchMarketData();
+    
+    // Update every 60 seconds
+    setInterval(fetchMarketData, 60000);
 });
 </script>
 </body>
